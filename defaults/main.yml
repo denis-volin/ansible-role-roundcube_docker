@@ -1,0 +1,20 @@
+---
+# defaults file for roundcube_docker
+
+roundcube_docker_dir: /opt/roundcube-docker
+
+roundcube_docker_compose:
+  roundcube_tag: 1.7.x-apache-nonroot
+  roundcube_port: 8080
+
+  imap_host: ""
+  imap_port: 993
+  smtp_host: ""
+  smtp_port: 465
+
+  des_key: ""
+  roundcube_env_extra: ""
+  roundcube_extra_hosts: []
+
+  postgres_tag: 18
+  db_password: ""

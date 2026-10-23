@@ -1,0 +1,57 @@
+name: roundcube
+
+services:
+  roundcube:
+    image: roundcube/roundcubemail:{{ roundcube_docker_compose['roundcube_tag'] }}
+    restart: unless-stopped
+    ports:
+      - "{{ roundcube_docker_compose['roundcube_port'] }}:80"
+{% if roundcube_docker_compose['roundcube_extra_hosts'] | length > 0 %}
+    extra_hosts:
+{{ roundcube_extra_hosts | to_nice_yaml(indent=6,sort_keys=False) }}
+{% endif %}
+    environment:
+      ROUNDCUBEMAIL_DB_TYPE: pgsql
+      ROUNDCUBEMAIL_DB_HOST: postgres
+      ROUNDCUBEMAIL_DB_NAME: roundcube
+      ROUNDCUBEMAIL_DB_USER: roundcube
+
+      ROUNDCUBEMAIL_DEFAULT_HOST: "{{ roundcube_docker_compose['imap_host'] }}"
+      ROUNDCUBEMAIL_DEFAULT_PORT: "{{ roundcube_docker_compose['imap_port'] }}"
+      ROUNDCUBEMAIL_SMTP_SERVER: "{{ roundcube_docker_compose['smtp_host'] }}"
+      ROUNDCUBEMAIL_SMTP_PORT: "{{ roundcube_docker_compose['smtp_port'] }}"
+
+{{ roundcube_docker_compose['roundcube_env_extra'] | indent(6) }}
+    secrets:
+      - roundcube_db_password
+      - roundcube_des_key
+    volumes:
+      - ./data/roundcube-html:/var/www/html
+      - ./config/roundcube:/var/roundcube/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:{{ roundcube_docker_compose['postgres_tag'] }}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: roundcube
+      POSTGRES_USER: roundcube
+      POSTGRES_PASSWORD_FILE: /run/secrets/roundcube_db_password
+    secrets:
+      - roundcube_db_password
+    volumes:
+      - ./data/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U roundcube -d roundcube"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+secrets:
+  roundcube_db_password:
+    file: ./secrets/db_password
+  roundcube_des_key:
+    file: ./secrets/des_key

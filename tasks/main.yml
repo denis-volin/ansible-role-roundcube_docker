@@ -1,0 +1,55 @@
+---
+# tasks file for roundcube_docker
+
+- name: Create config directory
+  ansible.builtin.file:
+    path: "{{ roundcube_docker_dir }}/config/roundcube"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create secured parent data and secrets directories
+  ansible.builtin.file:
+    path: "{{ roundcube_docker_dir }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop:
+    - data
+    - secrets
+
+- name: Create data directories
+  ansible.builtin.file:
+    path: "{{ roundcube_docker_dir }}/data/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0777"
+  loop:
+    - postgres
+    - roundcube-html
+
+- name: Write secrets to files
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "{{ roundcube_docker_dir }}/secrets/{{ item.file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - content: "{{ roundcube_docker_compose['db_password'] }}"
+      file: db_password
+    - content: "{{ roundcube_docker_compose['des_key'] }}"
+      file: des_key
+  loop_control:
+    label: "{{ item.file }}"
+
+- name: Render compose template
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ roundcube_docker_dir }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
