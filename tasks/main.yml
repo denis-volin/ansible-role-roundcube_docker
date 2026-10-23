@@ -39,9 +39,9 @@
     group: root
     mode: "0644"
   loop:
-    - content: "{{ roundcube_docker_compose['db_password'] }}"
+    - content: "{{ roundcube_docker_db_password }}"
       file: db_password
-    - content: "{{ roundcube_docker_compose['des_key'] }}"
+    - content: "{{ roundcube_docker_des_key }}"
       file: des_key
   loop_control:
     label: "{{ item.file }}"

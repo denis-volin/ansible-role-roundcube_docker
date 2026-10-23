@@ -1,39 +1,43 @@
-name: roundcube
+name: {{ roundcube_docker_compose_name }}
 
 services:
   roundcube:
-    image: roundcube/roundcubemail:{{ roundcube_docker_compose['roundcube_tag'] }}
+    image: roundcube/roundcubemail:{{ roundcube_docker_tag }}
     restart: unless-stopped
     ports:
-      - "{{ roundcube_docker_compose['roundcube_port'] }}:80"
-{% if roundcube_docker_compose['roundcube_extra_hosts'] | length > 0 %}
+      - "{{ roundcube_docker_port }}:8000"
+{% if roundcube_docker_extra_hosts | length > 0 %}
     extra_hosts:
-{{ roundcube_extra_hosts | to_nice_yaml(indent=6,sort_keys=False) }}
-{% endif %}
+      {{ roundcube_docker_extra_hosts | to_nice_yaml | indent(6) }}
+{%- endif %}
     environment:
       ROUNDCUBEMAIL_DB_TYPE: pgsql
       ROUNDCUBEMAIL_DB_HOST: postgres
       ROUNDCUBEMAIL_DB_NAME: roundcube
       ROUNDCUBEMAIL_DB_USER: roundcube
 
-      ROUNDCUBEMAIL_DEFAULT_HOST: "{{ roundcube_docker_compose['imap_host'] }}"
-      ROUNDCUBEMAIL_DEFAULT_PORT: "{{ roundcube_docker_compose['imap_port'] }}"
-      ROUNDCUBEMAIL_SMTP_SERVER: "{{ roundcube_docker_compose['smtp_host'] }}"
-      ROUNDCUBEMAIL_SMTP_PORT: "{{ roundcube_docker_compose['smtp_port'] }}"
-
-{{ roundcube_docker_compose['roundcube_env_extra'] | indent(6) }}
+{% if roundcube_docker_env_extra | length > 0 %}
+      {{ roundcube_docker_env_extra | indent(6) }}
+{% endif %}
+      ROUNDCUBEMAIL_DEFAULT_HOST: "{{ roundcube_docker_imap_host }}"
+      ROUNDCUBEMAIL_DEFAULT_PORT: "{{ roundcube_docker_imap_port }}"
+      ROUNDCUBEMAIL_SMTP_SERVER: "{{ roundcube_docker_smtp_host }}"
+      ROUNDCUBEMAIL_SMTP_PORT: "{{ roundcube_docker_smtp_port }}"
     secrets:
       - roundcube_db_password
       - roundcube_des_key
     volumes:
       - ./data/roundcube-html:/var/www/html
       - ./config/roundcube:/var/roundcube/config:ro
+{% if roundcube_docker_volumes_extra | length > 0 %}
+      {{ roundcube_docker_volumes_extra | to_nice_yaml | indent(6) }}
+{%- endif %}
     depends_on:
       postgres:
         condition: service_healthy
 
   postgres:
-    image: postgres:{{ roundcube_docker_compose['postgres_tag'] }}
+    image: postgres:{{ roundcube_docker_postgres_tag }}
     restart: unless-stopped
     environment:
       POSTGRES_DB: roundcube
