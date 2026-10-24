@@ -1,15 +1,15 @@
 ---
 # tasks file for roundcube_docker
 
-- name: Create config directory
+- name: Create compose project directory
   ansible.builtin.file:
-    path: "{{ roundcube_docker_dir }}/config/roundcube"
+    path: "{{ roundcube_docker_dir }}"
     state: directory
     owner: root
     group: root
     mode: "0755"
 
-- name: Create secured parent data and secrets directories
+- name: Create secured parent directories
   ansible.builtin.file:
     path: "{{ roundcube_docker_dir }}/{{ item }}"
     state: directory
@@ -17,6 +17,7 @@
     group: root
     mode: "0700"
   loop:
+    - config
     - data
     - secrets
 

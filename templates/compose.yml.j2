@@ -28,7 +28,6 @@ services:
       - roundcube_des_key
     volumes:
       - ./data/roundcube-html:/var/www/html
-      - ./config/roundcube:/var/roundcube/config:ro
 {% if roundcube_docker_volumes_extra | length > 0 %}
       {{ roundcube_docker_volumes_extra | to_nice_yaml | indent(6) }}
 {%- endif %}
