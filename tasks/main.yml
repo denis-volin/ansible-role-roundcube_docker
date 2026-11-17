@@ -36,9 +36,9 @@
   ansible.builtin.copy:
     content: "{{ item.content }}"
     dest: "{{ roundcube_docker_dir }}/secrets/{{ item.file }}"
-    owner: root
-    group: root
-    mode: "0644"
+    owner: 33
+    group: 33
+    mode: "0640"
   loop:
     - content: "{{ roundcube_docker_db_password }}"
       file: db_password
@@ -46,6 +46,14 @@
       file: des_key
   loop_control:
     label: "{{ item.file }}"
+
+- name: Copy upload max configuration
+  ansible.builtin.template:
+    src: upload-max-php.ini.j2
+    dest: "{{ roundcube_docker_dir }}/config/upload-max-php.ini"
+    owner: 33
+    group: 33
+    mode: "0644"
 
 - name: Render compose template
   ansible.builtin.template:

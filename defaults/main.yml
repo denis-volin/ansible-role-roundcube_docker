@@ -20,4 +20,6 @@ roundcube_docker_env_extra: ""
 roundcube_docker_postgres_tag: 18
 roundcube_docker_db_password: ""
 
+roundcube_docker_uplooad_max: 32M
+
 roundcube_docker_volumes_extra: []

@@ -28,6 +28,7 @@ services:
       - roundcube_des_key
     volumes:
       - ./data/roundcube-html:/var/www/html
+      - ./config/upload-max-php.ini:/usr/local/etc/php/conf.d/zzz-upload-max-php.ini:ro
 {% if roundcube_docker_volumes_extra | length > 0 %}
       {{ roundcube_docker_volumes_extra | to_nice_yaml | indent(6) }}
 {%- endif %}
