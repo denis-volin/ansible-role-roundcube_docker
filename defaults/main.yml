@@ -6,7 +6,7 @@ roundcube_docker_dir: /opt/roundcube-docker
 roundcube_docker_compose_name: roundcube
 
 roundcube_docker_tag: 1.7.x-apache-nonroot
-roundcube_docker_port: 8080
+roundcube_docker_port: 8000
 roundcube_docker_extra_hosts: []
 
 roundcube_docker_imap_host: ""
